@@ -1,4 +1,5 @@
 
+import uuid
 from datetime import datetime
 
 from sqlalchemy import (
@@ -15,13 +16,15 @@ from app.db.base import Base
 
 class URLCLICK(Base):
 
+    __tablename__ = "url_clicks"
+
     id: Mapped[int] = mapped_column(
         BigInteger,
         primary_key=True,
         autoincrement=True
     )
 
-    url_id: Mapped[str] = mapped_column(
+    url_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("urls.id", ondelete="CASCADE"),
         nullable=False,
         index=True

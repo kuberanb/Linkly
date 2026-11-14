@@ -11,6 +11,12 @@ class User(Base):
 
     __tablename__ = "users"
 
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4
+    )
+
  
     name: Mapped[str] = mapped_column(
         String(100),
