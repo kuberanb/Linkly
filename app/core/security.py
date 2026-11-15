@@ -56,7 +56,8 @@ def decode_access_token(token: str) -> dict:
     payload = jwt.decode(
         token,
         settings.JWT_SECRET,
-        algorithms=[settings.JWT_ALGORITHM]
+        algorithms=[settings.JWT_ALGORITHM],
+        options={"require": ["exp", "sub"]}
     )
 
     return payload

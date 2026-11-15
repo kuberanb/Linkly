@@ -1,13 +1,12 @@
 
-
-
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.db.session import get_db
+from app.models.user import User
 from app.schemas.auth import UserRegister, UserResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.services.auth_service import register_user, login_user
+from app.services.auth_service import get_current_user, register_user, login_user
 
 from app.schemas.auth import UserLogin, Token
 
@@ -43,6 +42,10 @@ async def login(
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     return token
+
+@router.get("/me",response_model=UserResponse)
+async def me(current_user: User = Depends(get_current_user)):
+    return current_user
 
 
 

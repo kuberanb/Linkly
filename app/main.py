@@ -1,5 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from contextlib import asynccontextmanager
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.db.session import engine
 from app.routes.auth import router as auth_router
@@ -33,8 +35,14 @@ async def root():
     }
 
 
-@app.get("/helath")
+@app.get("/health")
 async def health():
+    try:
+        async with engine.connect() as connection:
+            await connection.execute(text("SELECT 1"))
+    except SQLAlchemyError:
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
     return {
         "status":"healthy"
     }
