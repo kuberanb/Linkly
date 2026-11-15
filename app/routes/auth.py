@@ -11,7 +11,7 @@ from app.services.auth_service import get_current_user, register_user, login_use
 from app.schemas.auth import UserLogin, Token
 
 router = APIRouter(
-    prefix="/api/v1/auth",
+    prefix="/api/auth",
     tags=["Authentication"]
 )
 

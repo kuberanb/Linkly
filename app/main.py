@@ -5,6 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app.db.session import engine
 from app.routes.auth import router as auth_router
+from app.routes.urls import router as urls_router
 
 
 @asynccontextmanager
@@ -27,6 +28,7 @@ app = FastAPI(
 )
 
 app.include_router(auth_router)
+app.include_router(urls_router)
 
 @app.get("/")
 async def root():
