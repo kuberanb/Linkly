@@ -7,7 +7,9 @@ from app.db.session import get_db
 from app.schemas.auth import UserRegister, UserResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.services.auth_service import register_user
+from app.services.auth_service import register_user, login_user
+
+from app.schemas.auth import UserLogin, Token
 
 router = APIRouter(
     prefix="/api/v1/auth",
@@ -28,6 +30,19 @@ async def register(
         )
 
     return user
+
+
+@router.post("/login", response_model=Token)
+async def login(
+    user_data: UserLogin,
+    db: AsyncSession = Depends(get_db)
+):
+    token = await login_user(db, user_data.email, user_data.password)
+
+    if token is None:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    return token
 
 
 
