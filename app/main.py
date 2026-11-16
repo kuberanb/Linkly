@@ -10,6 +10,7 @@ from app.routes.urls import router as urls_router
 from redis.asyncio import Redis
 from app.core.config import settings
 import logging
+from socket import gaierror
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -17,7 +18,10 @@ logger = logging.getLogger("uvicorn.error")
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.redis = Redis.from_url(
-        settings.REDIS_URL, decode_responses=True
+        settings.REDIS_URL,
+        decode_responses=True,
+        socket_connect_timeout=1,
+        socket_timeout=1,
     )
     logger.info("Starting Linkly API")
 
@@ -39,7 +43,8 @@ app = FastAPI(
 
 
 @app.exception_handler(OperationalError)
-async def database_unavailable(_request: Request, _exc: OperationalError):
+@app.exception_handler(gaierror)
+async def database_unavailable(_request: Request, _exc: OperationalError | gaierror):
     logger.exception("Database operation failed")
     return JSONResponse(
         status_code=503,
@@ -62,7 +67,7 @@ async def health():
     try:
         async with engine.connect() as connection:
             await connection.execute(text("SELECT 1"))
-    except SQLAlchemyError:
+    except (SQLAlchemyError, gaierror):
         raise HTTPException(status_code=503, detail="Database unavailable")
 
     return {

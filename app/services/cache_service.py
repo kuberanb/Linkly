@@ -20,4 +20,3 @@ async def cache_url(redis:Redis, code:str,original_url:str) -> None:
 
     except RedisError:
         logger.warning("Redis cache write failed; continuing without cache")
-        pass             
